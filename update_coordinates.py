@@ -49,6 +49,6 @@ def update_coordinates(input_file, output_file, api_key):
 if __name__ == "__main__":
     input_file = "input.csv"
     output_file = "output.csv"
-    api_key = "AIzaSyCclVmPw5-hDum8rGDq1h_885je2430aQ8"  # Replace with your actual API key
+    api_key = ""  # Replace with your actual API key
     update_coordinates(input_file, output_file, api_key)
     print("Coordinates updated successfully.")
