@@ -2,25 +2,33 @@ import csv
 import requests
 
 def update_coordinates(input_file, output_file, api_key):
-    def get_coordinates(location_name):
+    def get_coordinates(location_name, retries=3):
         if location_name in location_cache:
             return location_cache[location_name]
 
-        base_url = "https://maps.googleapis.com/maps/api/geocode/json"
-        params = {
-            "address": f"{location_name}, Karnataka, India",
-            "key": api_key
-        }
-        response = requests.get(base_url, params=params)
-        data = response.json()
+        for attempt in range(retries):
+            try:
+                base_url = "https://maps.googleapis.com/maps/api/geocode/json"
+                params = {
+                    "address": f"{location_name}, Karnataka, India",
+                    "key": api_key
+                }
+                response = requests.get(base_url, params=params)
+                data = response.json()
 
-        if data["status"] == "OK":
-            location = data["results"][0]["geometry"]["location"]
-            location_cache[location_name] = (location["lat"], location["lng"])
-            return location["lat"], location["lng"]
-        else:
-            print(f"Error fetching coordinates for {location_name}: {data['status']}")
-            return None, None
+                if data["status"] == "OK":
+                    location = data["results"][0]["geometry"]["location"]
+                    location_cache[location_name] = (location["lat"], location["lng"])
+                    return location["lat"], location["lng"]
+                else:
+                    print(f"Error fetching coordinates for {location_name}: {data['status']}")
+                    return None, None
+            except requests.exceptions.RequestException as e:
+                print(f"Request error for {location_name}: {e}")
+                if attempt == retries - 1:
+                    print(f"Failed to fetch coordinates for {location_name} after {retries} retries.")
+                    return None, None
+
 
     location_cache = {}
 
